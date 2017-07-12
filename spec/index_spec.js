@@ -412,5 +412,37 @@ describe('stubPromise', function() {
           done();
         });
     });
+
+    it('supports catching bluebird construct to catch specific error catch(type, onReject)', function(done) {
+      promise.rejects(new ReferenceError('Reference Error'));
+
+      promise()
+        .catch(ReferenceError, function(error) {
+          return 'Reference Error';
+        })
+        .catch(function(error) {
+          return 'Generic Error';
+        })
+        .then(function (r){
+          expect(r).to.eql('Reference Error')
+          done();
+        });
+    });
+
+    it('skips catch specific type if error type does not match catch(type, onReject)', function(done) {
+      promise.rejects(new Error('Error'));
+
+      promise()
+        .catch(ReferenceError, function(error) {
+          return 'Reference Error';
+        })
+        .catch(function(error) {
+          return 'Generic Error';
+        })
+        .then(function (r){
+          expect(r).to.eql('Generic Error')
+          done();
+        });
+    });
   });
 });

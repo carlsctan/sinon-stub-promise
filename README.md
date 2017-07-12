@@ -1,11 +1,28 @@
 # sinon-stub-promise
-[![Build Status](https://travis-ci.org/substantial/sinon-stub-promise.svg?branch=master)](https://travis-ci.org/substantial/sinon-stub-promise)
 
-This is a little package that makes testing of promises easier when stubbing
-with [Sinon.JS](http://sinonjs.org/). This library ensures stubbed promises are
-evaluated synchronously, so that no special async tricks are required for
-testing.
+This is a fork of the original [sinon-stub-promise](sinon-https://github.com/substantial/sinon-stub-promise-promise) library.
+This version enhances the catch function to accept non-ES6-standard bluebird catch construct to handle specific type of error.
 
+Example
+```javascript
+it('supports catching bluebird construct to catch specific error catch(type, onReject)', function(done) {
+  promise.rejects(new ReferenceError('Reference Error'));
+
+  promise()
+    .catch(ReferenceError, function(error) {
+      return 'Reference Error';
+    })
+    .catch(function(error) {
+      return 'Generic Error';
+    })
+    .then(function (r){
+      expect(r).to.eql('Reference Error')
+      done();
+    });
+});
+```
+
+<!--
 ## Installation
 
 Install with npm: `npm install --save-dev sinon-stub-promise`
@@ -64,34 +81,4 @@ describe('stubbing a promise', function() {
 }
 ```
 
-## Why?
-
-We wanted a nice synchronous way of stubbing out promises while testing, and
-the existing solution,
-[sinon-as-promised](https://www.npmjs.com/package/sinon-as-promised), uses a
-promise under the hood to achieve the stubbing. The issue with this, is that
-the promise is evaluated asynchronously, so the test code has to deal with that
-by delaying the assertion until the promise has a chance to run.
-
-Additionally, sinon-as-promised requires you to call either `stub.resolves()`
-or `stub.rejects()` before it will setup the stub as a "thenable" object (one
-that has `then` and `catch` on it). The trouble with this is that if you are
-testing conditional branches (e.g. test what happens when promise succeeds,
-then test what happens when promise fails), you have to either resolve or
-reject the promise for the code under test to pass.
-
-## Usage with Karma
-
-In order to use this with the [Karma](http://karma-runner.github.io/) test runner
-you can either add `node_modules/sinon-stub-promise/index.js` to `files` in your config or, alternatively, use the
-[karma-sinon-stub-promise](https://github.com/alexweber/karma-sinon-stub-promise) plugin.
-
-## Stability?
-
-This is not a [Promises/A+](https://promisesaplus.com/) compliant library. We
-built it to support how we are currently using promises. There is a test suite
-that will grow over time as we identify any short comings of this library.
-
-## To Do
-
-* Allow for chaining with `withArgs`. Ideally we could do things like `sinon.stub().withArgs(42).resolves('value')`.
+-->

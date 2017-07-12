@@ -43,12 +43,29 @@ function buildThenable() {
     catch: function(onReject) {
       if (this.rejected) {
         try {
-          const value = onReject(this.rejectValue);
+          // To Support bluebird catch promises (out of ES6 Promise standard)
+          let value;
+          if(arguments.length === 2){
+            if(typeof arguments[0] === 'function' && typeof arguments[1] === 'function') {
+              errorType = arguments[0];
+              onReject = arguments[1];
+              if(errorType.name === this.rejectValue.name) {
+                value = onReject(this.rejectValue);
+              } else {
+                throw this.rejectValue;
+              }
+            }
+          } else {
+            if(typeof arguments[0] === 'function') {
+              onReject = arguments[0];
+              value = onReject(this.rejectValue);
+            }
+          }
 
           if (value && value.then) {
             return value;
           }
- 
+
           this.resolved = true;
           this.rejected = false;
           this.resolveValue = value;
